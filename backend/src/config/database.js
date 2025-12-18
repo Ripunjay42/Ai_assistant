@@ -1,4 +1,8 @@
 import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
+
+// Ensure dotenv is loaded
+dotenv.config();
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -13,7 +17,7 @@ const sequelize = new Sequelize(
       ssl: {
         require: true,
         rejectUnauthorized: true,
-        ca: process.env.DB_CA_CERT
+        ca: process.env.DB_CA_CERT ? process.env.DB_CA_CERT.replace(/\\n/g, '\n') : undefined
       }
     }
   }
