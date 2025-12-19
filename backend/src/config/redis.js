@@ -1,6 +1,6 @@
 import { createClient } from 'redis';
 
-const redisClient = createClient({
+export const redisClient = createClient({
   username: process.env.REDIS_USERNAME,
   password: process.env.REDIS_PASSWORD,
   socket: {
@@ -10,17 +10,24 @@ const redisClient = createClient({
 });
 
 redisClient.on('connect', () => {
-  console.log('Redis connected (Redis Cloud)');
+  console.log('Redis connecting...');
 });
 
 redisClient.on('ready', () => {
-  console.log('Redis ready');
+  console.log('Redis connected (Redis Cloud)');
 });
 
 redisClient.on('error', (err) => {
   console.error('Redis error:', err.message);
 });
 
-await redisClient.connect();
-
-export default redisClient;
+export const connectRedis = async () => {
+  try {
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
+    }
+  } catch (err) {
+    console.error('Redis connection failed:', err.message);
+    process.exit(1);
+  }
+};

@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.955.0",
     "@qdrant/js-client-rest": "^1.16.2",
     "amqplib": "^0.10.9",
     "bcrypt": "^6.0.0",
@@ -22,6 +23,8 @@
     "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.3",
     "kafkajs": "^2.2.4",
+    "multer": "^2.0.2",
+    "pdf-parse": "^2.4.5",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "redis": "^5.10.0",

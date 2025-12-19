@@ -28,6 +28,16 @@ const Document = sequelize.define(
     errorMessage: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+
+    workspaceId: {
+      type: DataTypes.UUID,
+      allowNull: false
+    },
+
+    uploadedBy: {
+      type: DataTypes.UUID,
+      allowNull: false
     }
   },
   {

@@ -13,6 +13,11 @@ const Workspace = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+
+    ownerId: {
+      type: DataTypes.UUID,
+      allowNull: false
     }
   },
   {

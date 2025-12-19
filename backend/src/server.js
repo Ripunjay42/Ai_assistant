@@ -1,23 +1,33 @@
-import app from './app.js';
-import { env } from './config/env.js';
+import 'dotenv/config';
+import express from 'express';
+
 import db from './models/index.js';
-import './config/redis.js';
+import { connectRedis } from './config/redis.js';
 import { initRabbitMQ } from './config/rabbitmq.js';
-import qdrant from './config/vector.js';
+import { checkS3Connection } from './config/s3.js';
+import { checkQdrantConnection } from './config/vector.js';
+import routes from './routes/index.js';
+
+const app = express();
+app.use(express.json());
+app.use('/api', routes);
 
 const startServer = async () => {
-  await db.init();
-  await initRabbitMQ();
+  try {
+    await db.init();
+    await connectRedis();
+    await initRabbitMQ();
+    await checkS3Connection();
+    await checkQdrantConnection();
 
-  const collections = await qdrant.getCollections();
-  console.log(
-    'Qdrant connected. Collections:',
-    collections.collections.map(c => c.name)
-  );
-
-  app.listen(env.port, () => {
-    console.log(`Server running on port ${env.port}`);
-  });
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Server startup failed:', err);
+    process.exit(1);
+  }
 };
 
 startServer();
