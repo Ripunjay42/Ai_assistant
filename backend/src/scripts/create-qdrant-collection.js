@@ -12,7 +12,7 @@ const run = async () => {
     );
 
     if (exists) {
-      console.log(`✅ Collection "${COLLECTION_NAME}" already exists`);
+      console.log(`Collection "${COLLECTION_NAME}" already exists`);
       process.exit(0);
     }
 
@@ -23,10 +23,10 @@ const run = async () => {
       }
     });
 
-    console.log(`🎉 Collection "${COLLECTION_NAME}" created successfully`);
+    console.log(` Collection "${COLLECTION_NAME}" created successfully`);
     process.exit(0);
   } catch (err) {
-    console.error('❌ Failed to create collection:', err.message);
+    console.error('Failed to create collection:', err.message);
     process.exit(1);
   }
 };

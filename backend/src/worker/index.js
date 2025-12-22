@@ -12,7 +12,7 @@ const startWorker = async () => {
 
     startDocumentConsumer(channel, QUEUE);
 
-    console.log('📄 Document ingestion worker started');
+    console.log('Document ingestion worker started');
   } catch (err) {
     console.error('Worker startup failed:', err);
     process.exit(1);

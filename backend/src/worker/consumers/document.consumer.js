@@ -3,19 +3,22 @@ import { readFileFromS3 } from '../services/s3-reader.service.js';
 import { extractText } from '../services/text-extractor.service.js';
 import { chunkText } from '../services/chunker.service.js';
 import { generateEmbeddings } from '../services/embedding.service.js';
-import qdrantClient from '../../config/qdrant.js';
+import { qdrantClient } from '../../config/vector.js';
+import { randomUUID } from 'crypto';
+
 
 const COLLECTION = 'documents';
 
-export const startDocumentConsumer = (channel) => {
-  channel.consume('document-ingestion', async (msg) => {
+export const startDocumentConsumer = (channel, queueName) => {
+  channel.consume(queueName, async (msg) => {
     if (!msg) return;
 
     const job = JSON.parse(msg.content.toString());
+    console.log('Received job:', job);
     const { documentId, bucket, s3Key } = job;
 
     try {
-      console.log(`📥 Processing document: ${documentId}`);
+      console.log(`Processing document: ${documentId}`);
 
       await db.Document.update(
         { status: 'PROCESSING' },
@@ -27,17 +30,20 @@ export const startDocumentConsumer = (channel) => {
       const chunks = chunkText(text);
       const embeddings = await generateEmbeddings(chunks);
 
-      await qdrantClient.upsert(COLLECTION, {
-        points: embeddings.map((e, index) => ({
-          id: `${documentId}_${index}`,
-          vector: e.embedding,
-          payload: {
-            documentId,
-            chunkIndex: index,
-            text: chunks[index]
-          }
-        }))
-      });
+    await qdrantClient.upsert(COLLECTION, {
+    points: embeddings.map((e, index) => ({
+    id: randomUUID(), //  VALID UUID
+    vector: e.embedding,
+    payload: {
+      documentId,
+      chunkIndex: index,
+      text: chunks[index]
+    }
+  }))
+});
+
+
+
 
       await db.Document.update(
         { status: 'READY' },
@@ -45,9 +51,9 @@ export const startDocumentConsumer = (channel) => {
       );
 
       channel.ack(msg);
-      console.log(`✅ Document ready: ${documentId}`);
+      console.log(`Document ready: ${documentId}`);
     } catch (err) {
-      console.error(`❌ Failed document ${documentId}`, err);
+      console.error(`Failed document ${documentId}`, err);
 
       await db.Document.update(
         { status: 'FAILED' },

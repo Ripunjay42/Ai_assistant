@@ -24,7 +24,7 @@
     "jsonwebtoken": "^9.0.3",
     "kafkajs": "^2.2.4",
     "multer": "^2.0.2",
-    "pdf-parse": "^2.4.5",
+    "pdf.js-extract": "^0.2.1",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "redis": "^5.10.0",
