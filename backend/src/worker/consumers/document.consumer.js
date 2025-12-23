@@ -15,7 +15,7 @@ export const startDocumentConsumer = (channel, queueName) => {
 
     const job = JSON.parse(msg.content.toString());
     console.log('Received job:', job);
-    const { documentId, bucket, s3Key } = job;
+    const { documentId, workspaceId, bucket, s3Key } = job;
 
     try {
       console.log(`Processing document: ${documentId}`);
@@ -30,18 +30,26 @@ export const startDocumentConsumer = (channel, queueName) => {
       const chunks = chunkText(text);
       const embeddings = await generateEmbeddings(chunks);
 
-    await qdrantClient.upsert(COLLECTION, {
-    points: embeddings.map((e, index) => ({
-    id: randomUUID(), //  VALID UUID
-    vector: e.embedding,
-    payload: {
-      documentId,
-      chunkIndex: index,
-      text: chunks[index]
-    }
-  }))
-});
+        const points = embeddings.map((e, index) => ({
+        id: randomUUID(),
+        vector: e.embedding,
+        payload: {
+          documentId,
+          workspaceId,
+          chunkIndex: index,
+          text: chunks[index]
+        }
+      }));
 
+      console.log('Points to be inserted:', {
+        totalPoints: points.length,
+        samplePoint: points[0],
+        vectorDimension: points[0]?.vector.length
+      });
+
+      await qdrantClient.upsert(COLLECTION, {
+        points
+      });
 
 
 

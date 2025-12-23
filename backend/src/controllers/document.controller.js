@@ -40,6 +40,7 @@ export const uploadDocument = async (req, res) => {
       Buffer.from(
         JSON.stringify({
           documentId: document.id,
+          workspaceId: workspaceId,
           bucket: process.env.AWS_S3_BUCKET,
           s3Key: key,
           fileUrl: url
