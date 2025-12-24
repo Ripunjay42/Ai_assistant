@@ -2,17 +2,18 @@ import { runRAG } from '../services/rag.service.js';
 
 export const chatWithDocuments = async (req, res) => {
   try {
-    const { question, workspaceId } = req.body;
+    const { question, workspaceId, chatId } = req.body;
 
     if (!question || !workspaceId) {
       return res
         .status(400)
-        .json({ message: 'Question and workspaceId are required' });
+        .json({ message: 'question and workspaceId are required' });
     }
 
     const result = await runRAG({
       question,
-      workspaceId
+      workspaceId,
+      chatId
     });
 
     res.json(result);
