@@ -62,11 +62,11 @@ export default function ChatWindow() {
   const chatMessages = messages[activeChatId] || [];
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-6 space-y-4 sm:space-y-6 scrollbar-none">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {chatMessages.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center h-full">
+          <div className="flex items-center justify-center min-h-full">
             <div className="text-center">
               <div className="w-12 h-12 mx-auto mb-3 bg-secondary/50 rounded-xl flex items-center justify-center">
                 <MessageSquare className="w-6 h-6 text-muted-foreground" />
@@ -76,21 +76,23 @@ export default function ChatWindow() {
             </div>
           </div>
         ) : (
-          chatMessages.map((m, i) => (
-            <MessageBubble
-              key={i}
-              role={m.role}
-              text={m.text}
-              loading={m.loading}
-              error={m.error}
-            />
-          ))
+          <>
+            {chatMessages.map((m, i) => (
+              <MessageBubble
+                key={i}
+                role={m.role}
+                text={m.text}
+                loading={m.loading}
+                error={m.error}
+              />
+            ))}
+            <div ref={messagesEndRef} />
+          </>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Input area */}
-      <div className="p-3 sm:p-6">
+      <div className="shrink-0 p-3 sm:p-6 border-t border-border/30">
         <ChatInput />
       </div>
     </div>

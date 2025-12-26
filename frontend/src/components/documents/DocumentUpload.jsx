@@ -1,18 +1,42 @@
-import { useState, useRef } from "react";
-import { Upload, FileText, X, CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Upload, FileText, X, CheckCircle, Loader2, AlertCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "../../store/auth.store";
 import { useUIStore } from "../../store/ui.store";
-import api from "../../services/api";
+import { useDocumentStore } from "../../store/document.store";
+import api, { getDocuments, deleteDocument } from "../../services/api";
 
 export default function DocumentUpload() {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState({}); // { filename: 'pending' | 'uploading' | 'success' | 'error' }
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState({});
   const fileInputRef = useRef(null);
   const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
   const openAuthModal = useUIStore((s) => s.openAuthModal);
+  const { documents, setDocuments, addDocument, removeDocument } = useDocumentStore();
+
+  // Fetch existing documents on mount and when workspaceId changes
+  useEffect(() => {
+    if (token && user?.workspaceId) {
+      fetchDocuments();
+    }
+  }, [token, user?.workspaceId]);
+
+  const fetchDocuments = async () => {
+    if (!user?.workspaceId) return;
+    
+    setLoadingDocs(true);
+    try {
+      const data = await getDocuments(user.workspaceId);
+      setDocuments(data.documents || []);
+    } catch (err) {
+      console.error('Failed to fetch documents:', err);
+    } finally {
+      setLoadingDocs(false);
+    }
+  };
 
   const handleFileSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -49,26 +73,51 @@ export default function DocumentUpload() {
         formData.append('file', file);
         formData.append('workspaceId', user?.workspaceId || 'default');
 
-        await api.post('/documents/upload', formData, {
+        const response = await api.post('/documents/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
 
         setUploadStatus(prev => ({ ...prev, [file.name]: 'success' }));
+        
+        // Add to document store
+        if (response.data.document) {
+          addDocument(response.data.document);
+        }
       } catch (err) {
         console.error('Upload error:', err);
-        setUploadStatus(prev => ({ ...prev, [file.name]: 'error' }));
+        
+        // Check for duplicate error (409 status)
+        if (err.response?.status === 409) {
+          setUploadStatus(prev => ({ ...prev, [file.name]: 'duplicate' }));
+        } else {
+          setUploadStatus(prev => ({ ...prev, [file.name]: 'error' }));
+        }
       }
     }
 
     setUploading(false);
     
-    // Clear successful uploads after 2 seconds
+    // Refresh document list
+    await fetchDocuments();
+    
+    // Clear successful and duplicate uploads after 2 seconds
     setTimeout(() => {
-      setFiles(prev => prev.filter(f => uploadStatus[f.name] !== 'success'));
+      setFiles(prev => prev.filter(f => 
+        uploadStatus[f.name] !== 'success' && uploadStatus[f.name] !== 'duplicate'
+      ));
       setUploadStatus({});
     }, 2000);
+  };
+
+  const handleDeleteDocument = async (docId) => {
+    try {
+      await deleteDocument(docId);
+      removeDocument(docId);
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
   };
 
   const getStatusIcon = (filename) => {
@@ -78,6 +127,8 @@ export default function DocumentUpload() {
         return <Loader2 className="w-4 h-4 text-primary animate-spin" />;
       case 'success':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'duplicate':
+        return <AlertCircle className="w-4 h-4 text-yellow-500" />;
       case 'error':
         return <AlertCircle className="w-4 h-4 text-destructive" />;
       default:
@@ -85,8 +136,50 @@ export default function DocumentUpload() {
     }
   };
 
+  const getStatusMessage = (filename) => {
+    const status = uploadStatus[filename];
+    if (status === 'duplicate') return 'Already exists';
+    if (status === 'error') return 'Failed';
+    return null;
+  };
+
   return (
     <div className="space-y-3">
+      {/* Existing Documents */}
+      {documents.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground px-1">Uploaded Documents</p>
+          <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
+            {documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="flex items-center gap-2 p-2 bg-secondary/30 rounded-lg group"
+              >
+                <FileText className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span className="text-xs text-foreground truncate flex-1">
+                  {doc.name}
+                </span>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {doc.status}
+                </span>
+                <button
+                  onClick={() => handleDeleteDocument(doc.id)}
+                  className="p-1 opacity-0 group-hover:opacity-100 hover:bg-destructive/20 rounded transition-all"
+                >
+                  <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {loadingDocs && (
+        <div className="flex items-center justify-center p-3">
+          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+          <span className="text-xs text-muted-foreground ml-2">Loading documents...</span>
+        </div>
+      )}
       {/* Upload area */}
       <div
         onClick={() => fileInputRef.current?.click()}
@@ -122,6 +215,11 @@ export default function DocumentUpload() {
                 {file.name}
               </span>
               {getStatusIcon(file.name)}
+              {getStatusMessage(file.name) && (
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {getStatusMessage(file.name)}
+                </span>
+              )}
               {!uploading && (
                 <button
                   onClick={() => removeFile(index)}

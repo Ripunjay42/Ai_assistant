@@ -38,4 +38,16 @@ export const streamChat = async ({ question, workspaceId, chatId }) => {
   return response;
 };
 
+// Get documents for workspace
+export const getDocuments = async (workspaceId) => {
+  const response = await api.get(`/documents?workspaceId=${workspaceId}`);
+  return response.data;
+};
+
+// Delete document
+export const deleteDocument = async (documentId) => {
+  const response = await api.delete(`/documents/${documentId}`);
+  return response.data;
+};
+
 export default api;
