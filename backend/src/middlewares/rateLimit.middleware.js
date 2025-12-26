@@ -1,7 +1,7 @@
 import { redisClient } from '../config/redis.js';
 
 const MAX_REQ = 20;
-const WINDOW = 60; // seconds
+const WINDOW = 60 * 60; // seconds
 
 export const rateLimit = async (req, res, next) => {
   const userId = req.user.userId;

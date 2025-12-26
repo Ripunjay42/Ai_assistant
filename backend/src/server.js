@@ -1,16 +1,11 @@
 import 'dotenv/config';
-import express from 'express';
 
+import app from './app.js';
 import db from './models/index.js';
 import { connectRedis } from './config/redis.js';
 import { initRabbitMQ } from './config/rabbitmq.js';
 import { checkS3Connection } from './config/s3.js';
 import { checkQdrantConnection } from './config/vector.js';
-import routes from './routes/index.js';
-
-const app = express();
-app.use(express.json());
-app.use('/api', routes);
 
 const startServer = async () => {
   try {

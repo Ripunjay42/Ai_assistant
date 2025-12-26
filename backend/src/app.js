@@ -5,7 +5,18 @@ import errorHandler from './middlewares/error.middleware.js';
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['content-type', 'authorization'],
+  exposedHeaders: ['content-type', 'authorization']
+}));
+
 app.use(express.json());
 
 app.use('/api', routes);

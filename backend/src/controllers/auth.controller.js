@@ -37,7 +37,8 @@ export const signup = async (req, res) => {
     user: {
       id: user.id,
       email: user.email,
-      name: user.name
+      name: user.name,
+      workspaceId: workspace.id
     }
   });
 };
@@ -55,6 +56,11 @@ export const login = async (req, res) => {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
+  // Get user's workspace
+  const membership = await db.WorkspaceMember.findOne({
+    where: { userId: user.id }
+  });
+
   const token = signToken({ userId: user.id });
 
   res.json({
@@ -62,7 +68,8 @@ export const login = async (req, res) => {
     user: {
       id: user.id,
       email: user.email,
-      name: user.name
+      name: user.name,
+      workspaceId: membership?.workspaceId || null
     }
   });
 };
