@@ -1,14 +1,25 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
-const getStoredChats = () => {
-  try {
-    const stored = localStorage.getItem("chat-storage");
-    return stored ? JSON.parse(stored) : { chats: [], activeChatId: null, messages: {} };
-  } catch {
-    return { chats: [], activeChatId: null, messages: {} };
-  }
-};
+// Create a custom storage that uses user-specific keys
+const createUserStorage = () => ({
+  getItem: (name) => {
+    const userId = localStorage.getItem("currentUserId");
+    const key = userId ? `${name}-${userId}` : name;
+    const str = localStorage.getItem(key);
+    return str ? JSON.parse(str) : null;
+  },
+  setItem: (name, value) => {
+    const userId = localStorage.getItem("currentUserId");
+    const key = userId ? `${name}-${userId}` : name;
+    localStorage.setItem(key, JSON.stringify(value));
+  },
+  removeItem: (name) => {
+    const userId = localStorage.getItem("currentUserId");
+    const key = userId ? `${name}-${userId}` : name;
+    localStorage.removeItem(key);
+  },
+});
 
 export const useChatStore = create(
   persist(
@@ -71,9 +82,18 @@ export const useChatStore = create(
         messages: newMessages,
       };
     }),
+
+  // Clear all chat data (on logout)
+  clearChats: () =>
+    set({
+      chats: [],
+      activeChatId: null,
+      messages: {},
+    }),
     }),
     {
       name: "chat-storage",
+      storage: createJSONStorage(() => createUserStorage()),
       partialize: (state) => ({
         chats: state.chats,
         activeChatId: state.activeChatId,
