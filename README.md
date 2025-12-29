@@ -6,7 +6,7 @@ A full-stack RAG (Retrieval-Augmented Generation) application that enables users
 ![AI](https://img.shields.io/badge/AI-Gemini-orange)
 ![Vector DB](https://img.shields.io/badge/Vector-Qdrant-green)
 
-## 🚀 Features
+## Features
 
 - **Document Upload & Processing**: Upload PDF, TXT, MD, and JSON files (up to 10MB)
 - **AI-Powered Chat**: Ask questions about your documents using natural language
@@ -17,7 +17,7 @@ A full-stack RAG (Retrieval-Augmented Generation) application that enables users
 - **Vector Search**: Semantic search using Qdrant vector database
 - **Background Processing**: Asynchronous document ingestion using RabbitMQ
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────┐         ┌──────────────┐         ┌─────────────┐
@@ -70,7 +70,7 @@ A full-stack RAG (Retrieval-Augmented Generation) application that enables users
 - **Render** - Backend deployment
 - **Vercel** - Frontend deployment
 
-## 📊 Database Design
+## Database Design
 
 ### Entity Relationship Diagram
 
@@ -191,7 +191,7 @@ CREATE TABLE documents (
 `rate:${userId}` → count
 ```
 
-## 🔄 System Flow
+## System Flow
 
 ### 1. Document Upload Flow
 
@@ -285,7 +285,7 @@ Return success
 Frontend removes from UI
 ```
 
-## 🔐 Authentication & Security
+## Authentication & Security
 
 - **JWT-based authentication** with Bearer tokens
 - **Rate limiting**: 20 requests per hour per user (Redis-backed)
@@ -294,7 +294,7 @@ Frontend removes from UI
 - **Environment variables**: Sensitive credentials stored securely
 - **CORS**: Configured for specific origins only
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ai-assistant/
@@ -337,7 +337,7 @@ ai-assistant/
     └── package.json
 ```
 
-## 🚦 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -440,7 +440,7 @@ npm run dev
 http://localhost:5173
 ```
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/auth/signup` - User registration
@@ -458,7 +458,7 @@ http://localhost:5173
 ### Health
 - `GET /api/health` - Health check
 
-## 🎨 UI Features
+## UI Features
 
 - **Dark theme** with cyan accent colors
 - **Animated grid background** with flowing effect
@@ -468,7 +468,7 @@ http://localhost:5173
 - **Responsive design** for mobile and desktop
 - **Toast notifications** for user feedback
 
-## 🔧 Configuration
+## Configuration
 
 ### Rate Limiting
 ```javascript
@@ -493,7 +493,7 @@ chunkSize = 500        // Characters per chunk
 overlap = 50           // Overlap between chunks
 ```
 
-## 🚀 Deployment
+##  Deployment
 
 ### Backend (Render)
 1. Create new Web Service
