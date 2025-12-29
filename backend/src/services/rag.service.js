@@ -14,23 +14,23 @@ import {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const runRAG = async ({ question, workspaceId, chatId }) => {
-  // 0️⃣ Cache check
+  // Cache check
   const cached = await getCachedRagAnswer(workspaceId, question);
   if (cached) {
     console.log('RAG cache hit');
     return cached;
   }
 
-  // 1️⃣ Chat memory
+  // Chat memory
   const memory = chatId ? await getChatMemory(chatId) : [];
   const history = memory
     .map(m => `${m.role}: ${m.content}`)
     .join('\n');
 
-  // 2️⃣ Embed the question
+  // Embed the question
   const queryEmbedding = await embedText(question);
 
-  // 3️⃣ Retrieve relevant document chunks
+  // Retrieve relevant document chunks
   const chunks = await searchVectors(queryEmbedding, workspaceId);
 
   if (chunks.length === 0) {
@@ -40,7 +40,7 @@ export const runRAG = async ({ question, workspaceId, chatId }) => {
     };
   }
 
-  // 4️⃣ Build context
+  // Build context
   const context = chunks
     .map((c, i) => `Source ${i + 1}:\n${c.text}`)
     .join('\n\n');
@@ -58,7 +58,7 @@ Question:
 ${question}
 `;
 
-  // 5️⃣ Ask Gemini with retry logic
+  // Ask Gemini with retry logic
   const answer = await retryWithBackoff(async () => {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const result = await model.generateContent(prompt);
@@ -75,13 +75,13 @@ ${question}
     }))
   };
 
-  // 6️⃣ Save memory
+  // save memory
   if (chatId) {
     await saveMessage(chatId, 'user', question);
     await saveMessage(chatId, 'assistant', result.answer);
   }
 
-  // 7️⃣ Cache result
+  // Cache result
   await setCachedRagAnswer(workspaceId, question, result);
 
   return result;

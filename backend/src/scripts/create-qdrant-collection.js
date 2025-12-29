@@ -31,13 +31,20 @@ const run = async () => {
       field_schema: 'keyword'
     });
 
-    console.log(`✅ Collection "${COLLECTION_NAME}" created successfully`);
+    // Create index for documentId filtering (needed for deletion)
+    await qdrantClient.createPayloadIndex(COLLECTION_NAME, {
+      field_name: 'documentId',
+      field_schema: 'keyword'
+    });
+
+    console.log(`Collection "${COLLECTION_NAME}" created successfully`);
     console.log(`   - Vector size: ${VECTOR_SIZE}`);
     console.log(`   - Payload index: workspaceId (keyword)`);
+    console.log(`   - Payload index: documentId (keyword)`);
     
     process.exit(0);
   } catch (err) {
-    console.error('❌ Failed to create collection:', err.message);
+    console.error('Failed to create collection:', err.message);
     process.exit(1);
   }
 };

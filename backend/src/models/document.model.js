@@ -38,6 +38,11 @@ const Document = sequelize.define(
     uploadedBy: {
       type: DataTypes.UUID,
       allowNull: false
+    },
+
+    s3Key: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {

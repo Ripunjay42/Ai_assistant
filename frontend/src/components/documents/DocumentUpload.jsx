@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { Upload, FileText, X, CheckCircle, Loader2, AlertCircle, Trash2 } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Upload, FileText, X, CheckCircle, Loader2, AlertCircle, Trash2, Clock, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "../../store/auth.store";
 import { useUIStore } from "../../store/ui.store";
@@ -12,10 +12,16 @@ export default function DocumentUpload() {
   const [loadingDocs, setLoadingDocs] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
   const fileInputRef = useRef(null);
+  const pollingRef = useRef(null);
   const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
   const openAuthModal = useUIStore((s) => s.openAuthModal);
-  const { documents, setDocuments, addDocument, removeDocument } = useDocumentStore();
+  const { documents, setDocuments, addDocument, removeDocument, updateDocument } = useDocumentStore();
+
+  // Check if any documents are still processing
+  const hasProcessingDocs = documents.some(
+    (doc) => doc.status === 'UPLOADED' || doc.status === 'PROCESSING'
+  );
 
   // Fetch existing documents on mount and when workspaceId changes
   useEffect(() => {
@@ -23,6 +29,29 @@ export default function DocumentUpload() {
       fetchDocuments();
     }
   }, [token, user?.workspaceId]);
+
+  // Poll for status updates when documents are processing
+  useEffect(() => {
+    if (hasProcessingDocs && token && user?.workspaceId) {
+      // Start polling every 2 seconds
+      pollingRef.current = setInterval(() => {
+        fetchDocuments();
+      }, 2000);
+    } else {
+      // Stop polling when no documents are processing
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+      }
+    };
+  }, [hasProcessingDocs, token, user?.workspaceId]);
 
   const fetchDocuments = async () => {
     if (!user?.workspaceId) return;
@@ -143,33 +172,86 @@ export default function DocumentUpload() {
     return null;
   };
 
+  // Get status icon and color for document status
+  const getDocStatusDisplay = (status) => {
+    switch (status) {
+      case 'UPLOADED':
+        return {
+          icon: <Clock className="w-3 h-3 animate-pulse" />,
+          color: 'text-yellow-500',
+          bg: 'bg-yellow-500/10',
+          label: 'Queued'
+        };
+      case 'PROCESSING':
+        return {
+          icon: <Loader2 className="w-3 h-3 animate-spin" />,
+          color: 'text-blue-400',
+          bg: 'bg-blue-500/10',
+          label: 'Processing'
+        };
+      case 'READY':
+        return {
+          icon: <CheckCircle className="w-3 h-3" />,
+          color: 'text-green-500',
+          bg: 'bg-green-500/10',
+          label: 'Ready'
+        };
+      case 'FAILED':
+        return {
+          icon: <AlertCircle className="w-3 h-3" />,
+          color: 'text-red-500',
+          bg: 'bg-red-500/10',
+          label: 'Failed'
+        };
+      default:
+        return {
+          icon: <FileText className="w-3 h-3" />,
+          color: 'text-muted-foreground',
+          bg: 'bg-secondary/30',
+          label: status
+        };
+    }
+  };
+
   return (
     <div className="space-y-3">
       {/* Existing Documents */}
       {documents.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-muted-foreground px-1">Uploaded Documents</p>
+          <div className="flex items-center justify-between px-1">
+            <p className="text-xs text-muted-foreground">Uploaded Documents</p>
+            {hasProcessingDocs && (
+              <span className="text-xs text-blue-400 flex items-center gap-1">
+                <Zap className="w-3 h-3" />
+                Processing...
+              </span>
+            )}
+          </div>
           <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
-            {documents.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex items-center gap-2 p-2 bg-secondary/30 rounded-lg group"
-              >
-                <FileText className="w-4 h-4 text-cyan-400 shrink-0" />
-                <span className="text-xs text-foreground truncate flex-1">
-                  {doc.name}
-                </span>
-                <span className="text-xs text-muted-foreground shrink-0">
-                  {doc.status}
-                </span>
-                <button
-                  onClick={() => handleDeleteDocument(doc.id)}
-                  className="p-1 opacity-0 group-hover:opacity-100 hover:bg-destructive/20 rounded transition-all"
+            {documents.map((doc) => {
+              const statusDisplay = getDocStatusDisplay(doc.status);
+              return (
+                <div
+                  key={doc.id}
+                  className={`flex items-center gap-2 p-2 rounded-lg group transition-all ${statusDisplay.bg}`}
                 >
-                  <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
-                </button>
-              </div>
-            ))}
+                  <FileText className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <span className="text-xs text-foreground truncate flex-1">
+                    {doc.name}
+                  </span>
+                  <span className={`text-xs shrink-0 flex items-center gap-1 ${statusDisplay.color}`}>
+                    {statusDisplay.icon}
+                    {statusDisplay.label}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteDocument(doc.id)}
+                    className="p-1 opacity-0 group-hover:opacity-100 hover:bg-destructive/20 rounded transition-all"
+                  >
+                    <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

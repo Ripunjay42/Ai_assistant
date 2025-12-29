@@ -1,5 +1,6 @@
 import db from '../models/index.js';
-import { uploadToS3 } from '../services/storage.service.js';
+import { uploadToS3, deleteFromS3 } from '../services/storage.service.js';
+import { deleteVectorsByDocumentId } from '../services/vector-search.service.js';
 import { getChannel, QUEUE } from '../config/rabbitmq.js';
 
 export const uploadDocument = async (req, res) => {
@@ -49,7 +50,8 @@ export const uploadDocument = async (req, res) => {
       type: file.mimetype,
       workspaceId,
       uploadedBy: userId,
-      status: 'UPLOADED'
+      status: 'UPLOADED',
+      s3Key: key
     });
 
     // Push job to RabbitMQ
@@ -141,10 +143,20 @@ export const deleteDocument = async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
+    // Delete from S3 if s3Key exists
+    if (document.s3Key) {
+      try {
+        await deleteFromS3(document.s3Key);
+      } catch (err) {
+        console.error('S3 deletion failed, continuing...', err.message);
+      }
+    }
+
+    // Delete vectors from Qdrant
+    await deleteVectorsByDocumentId(document.id);
+
     // Delete from database
     await document.destroy();
-
-    // TODO: Also delete from S3 and Qdrant if needed
 
     return res.json({ message: 'Document deleted successfully' });
   } catch (err) {

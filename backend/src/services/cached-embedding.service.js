@@ -11,12 +11,12 @@ export const getCachedEmbedding = async (text) => {
   // Try to get from cache
   const cached = await redisClient.get(cacheKey);
   if (cached) {
-    console.log('✅ Embedding cache hit');
+    console.log('Embedding cache hit');
     return JSON.parse(cached);
   }
   
   // Not in cache, call API
-  console.log('❌ Embedding cache miss, calling API');
+  console.log('Embedding cache miss, calling API');
   const embedding = await embedText(text);
   
   // Store in cache (expire after 7 days)

@@ -18,21 +18,21 @@ export const streamRAG = async ({
   chatId,
   res
 }) => {
-  // 0️⃣ Cache check
+  // Cache check
   const cached = await getCachedRagAnswer(workspaceId, question);
   if (cached) {
-    console.log('⚡ RAG cache hit (streaming)');
+    console.log('RAG cache hit (streaming)');
     res.write(`data: ${cached.answer}\n\n`);
     return;
   }
 
-  // 1️⃣ Chat memory
+  // Chat memory
   const memory = chatId ? await getChatMemory(chatId) : [];
   const history = memory
     .map(m => `${m.role}: ${m.content}`)
     .join('\n');
 
-  // 2️⃣ Vector search
+  // Vector search
   const embedding = await embedText(question);
   const chunks = await searchVectors(embedding, workspaceId);
 
@@ -45,11 +45,13 @@ export const streamRAG = async ({
     .map((c, i) => `Source ${i + 1}:\n${c.text}`)
     .join('\n\n');
 
-  // 3️⃣ Prompt
+  // Prompt
   const prompt = `
 You are an AI assistant.
-Answer the question ONLY using the context below.
-If the answer is not present, say "I don't know".
+Answer the question using ONLY the information provided in the CONTEXT section.
+Use the CONVERSATION HISTORY only to understand follow-up questions or references.
+Do NOT use external knowledge, assumptions, or prior training data.
+If the answer is not present, say "I don’t see this information in the documents I have access to".
 
 ${history ? `Conversation:\n${history}\n\n` : ''}Context:
 ${context}
@@ -58,8 +60,8 @@ Question:
 ${question}
 `;
 
-  // 4️⃣ Gemini streaming
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  // Gemini streaming
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const result = await model.generateContentStream(prompt);
 
   let fullAnswer = '';
@@ -74,13 +76,13 @@ ${question}
     }
   }
 
-  // 5️⃣ Save memory (after stream completes)
+  // Save memory (after stream completes)
   if (chatId) {
     await saveMessage(chatId, 'user', question);
     await saveMessage(chatId, 'assistant', fullAnswer);
   }
 
-  // 6️⃣ Cache final answer (complete response only)
+  // Cache final answer (complete response only)
   await setCachedRagAnswer(workspaceId, question, {
     answer: fullAnswer,
     sources: chunks.map((c, i) => ({

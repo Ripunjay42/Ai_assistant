@@ -24,7 +24,7 @@ export default function MessageBubble({ role, text, loading, error }) {
       <div
         className={`max-w-[75%] rounded-xl px-4 py-2.5 ${
           isUser
-            ? "bg-primary text-white rounded-tr-sm"
+            ? "bg-cyan-700 text-white rounded-tr-sm"
             : error
             ? "bg-destructive/10 text-destructive border border-destructive/30 rounded-tl-sm"
             : "bg-secondary/50 border border-border/50 text-foreground rounded-tl-sm"

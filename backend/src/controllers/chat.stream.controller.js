@@ -9,7 +9,7 @@ export const streamChat = async (req, res) => {
     });
   }
 
-  // 🔑 SSE headers
+  //  SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
