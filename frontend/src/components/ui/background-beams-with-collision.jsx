@@ -47,11 +47,7 @@ export const BackgroundBeamsWithCollision = ({ children, className }) => {
 
       <div
         ref={containerRef}
-        className="absolute bottom-0 left-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"
-        style={{
-          boxShadow:
-            "0 0 24px rgba(6, 182, 212, 0.4), 0 0 48px rgba(6, 182, 212, 0.2), 0 0 72px rgba(6, 182, 212, 0.1)",
-        }}
+        className="absolute bottom-0 left-0 right-0 w-full h-2"
       />
     </div>
   );
