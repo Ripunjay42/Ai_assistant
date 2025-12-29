@@ -62,7 +62,7 @@ export default function ChatWindow() {
   const chatMessages = messages[activeChatId] || [];
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex flex-col h-full overflow-hidden pb-safe">
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 scrollbar-none">
         {chatMessages.length === 0 ? (
@@ -92,7 +92,7 @@ export default function ChatWindow() {
       </div>
 
       {/* Input area */}
-      <div className="shrink-0 p-3 sm:p-6 border-t border-border/30">
+      <div className="shrink-0 p-3 sm:p-6 border-t border-border/30 bg-background">
         <ChatInput />
       </div>
     </div>
