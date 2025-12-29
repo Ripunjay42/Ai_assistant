@@ -32,7 +32,7 @@ export default function ChatWindow() {
           </p>
 
           {/* Feature cards */}
-          <div className="grid grid-cols-2 gap-3 mb-8">
+          {/* <div className="grid grid-cols-2 gap-3 mb-8">
             <div className="p-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-lg text-left">
               <Search className="w-5 h-5 text-primary mb-2" />
               <h3 className="font-medium text-sm">Smart Search</h3>
@@ -43,7 +43,7 @@ export default function ChatWindow() {
               <h3 className="font-medium text-sm">Document Q&A</h3>
               <p className="text-xs text-muted-foreground">Query your files</p>
             </div>
-          </div>
+          </div> */}
 
           {/* CTA Button */}
           <Button 

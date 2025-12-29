@@ -92,7 +92,7 @@ export default function AuthModal() {
           <p className="text-sm text-muted-foreground mt-1">
             {authModalTab === "login" 
               ? "Sign in to continue" 
-              : "Get started with NexusAI"}
+              : "Get started with Query Quill"}
           </p>
         </div>
 
