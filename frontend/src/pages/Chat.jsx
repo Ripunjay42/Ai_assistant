@@ -10,14 +10,14 @@ export default function Chat() {
       <div className="fixed inset-0 grid-background pointer-events-none" />
       
       {/* Animated beams with collision */}
-      <BackgroundBeamsWithCollision />
+      {/* <BackgroundBeamsWithCollision /> */}
       
       <Navbar />
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar />
         {/* Centered chat container */}
-        <div className="flex-1 flex justify-center overflow-hidden">
-          <div className="w-full max-w-4xl flex flex-col">
+        <div className="flex-1 flex justify-center items-center overflow-hidden py-4">
+          <div className="w-full max-w-4xl h-[85vh] flex flex-col">
             <ChatWindow />
           </div>
         </div>
