@@ -20,3 +20,5 @@ const startWorker = async () => {
 };
 
 startWorker();
+
+process.stdin.resume();
