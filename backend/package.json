@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "start": "node src/server.js",
+    "worker": "node src/worker/index.js",
     "db:migrate": "npx sequelize-cli db:migrate --config sequelize.config.cjs"
   },
   "keywords": [],
