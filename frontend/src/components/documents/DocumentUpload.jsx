@@ -35,7 +35,7 @@ export default function DocumentUpload() {
     if (hasProcessingDocs && token && user?.workspaceId) {
       // Start polling every 2 seconds
       pollingRef.current = setInterval(() => {
-        fetchDocuments();
+        fetchDocuments(true); // Pass true to indicate this is a polling request
       }, 2000);
     } else {
       // Stop polling when no documents are processing
@@ -53,17 +53,22 @@ export default function DocumentUpload() {
     };
   }, [hasProcessingDocs, token, user?.workspaceId]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = async (isPolling = false) => {
     if (!user?.workspaceId) return;
     
-    setLoadingDocs(true);
+    // Only show loading spinner on initial fetch, not during polling
+    if (!isPolling) {
+      setLoadingDocs(true);
+    }
     try {
       const data = await getDocuments(user.workspaceId);
       setDocuments(data.documents || []);
     } catch (err) {
       console.error('Failed to fetch documents:', err);
     } finally {
-      setLoadingDocs(false);
+      if (!isPolling) {
+        setLoadingDocs(false);
+      }
     }
   };
 
