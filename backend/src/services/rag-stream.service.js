@@ -46,48 +46,25 @@ export const streamRAG = async ({
     .join('\n\n');
 
   // Prompt
-const prompt = `
-You are a helpful AI assistant.
+  const prompt = `
+You are an AI assistant.
+Use the CONVERSATION HISTORY to understand follow-up questions and user intent.
+If relevant information is available in the CONTEXT, use it to provide an accurate, grounded answer.
+If the CONTEXT does not contain the answer or is empty, answer the question using your general knowledge.
+Be clear, concise, and helpful.
+Do not invent facts or reference documents that are not present.
+At the end of your answer, clearly indicate the source in brackets using ONE of the following:
+- [Source: Documents]
+- [Source: General Knowledge]
+Make sure always mention the source label at the end of EACH answer for each query and place it at the end of the paragraph in a new single line.
 
-Use the CONVERSATION HISTORY only to understand follow-up questions and user intent.
+${history ? `Conversation:\n${history}\n\n` : ''}
 
-IMPORTANT RULES (MUST FOLLOW STRICTLY):
-1. Answer ONLY the user’s current QUESTION.
-2. Do NOT introduce or answer unrelated topics.
-3. Write the answer using SHORT, CLEAR paragraphs.
-4. EACH paragraph must:
-   - Contain ONE complete idea only
-   - Be written in complete sentences
-   - End with exactly ONE source label on a new line
-5. Allowed source labels:
-   - [Source: Documents] → only if the information is explicitly present in CONTEXT
-   - [Source: General Knowledge] → only if the information is NOT present in CONTEXT
-6. NEVER mix document-based information and general knowledge in the same paragraph.
-7. NEVER fabricate or infer document-based information.
-8. Do NOT apologize, speculate, or explain missing context unless explicitly asked.
-9. If CONTEXT is empty or irrelevant, answer using GENERAL KNOWLEDGE only.
-10. Do NOT repeat phrases, sentence fragments, or partial clauses.
-11. Make sure always mention the source label at the end of EACH answer for each query and place it at the end of the paragraph in a new single line.
+Context:
+${context}
 
-Formatting rules:
-- Do NOT join multiple ideas with commas or conjunctions.
-- Do NOT create run-on sentences.
-- Start a new paragraph for each idea.
-
-Answering logic:
-- If the QUESTION can be answered using CONTEXT, answer using CONTEXT only.
-- If the QUESTION cannot be answered using CONTEXT, answer using GENERAL KNOWLEDGE only.
-- Do NOT combine both in a single answer unless explicitly requested.
-
-${history ? `CONVERSATION HISTORY:\n${history}\n` : ''}
-
-CONTEXT:
-${context || '[NO CONTEXT PROVIDED]'}
-
-QUESTION:
+Question:
 ${question}
-
-ANSWER:
 `;
 
   // Gemini streaming
