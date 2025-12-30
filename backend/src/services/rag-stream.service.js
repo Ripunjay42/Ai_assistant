@@ -53,8 +53,9 @@ If relevant information is available in the CONTEXT, use it to provide an accura
 If the CONTEXT does not contain the answer or is empty, answer the question using your general knowledge.
 Be clear, concise, and helpful.
 Do not invent facts or reference documents that are not present.
-add source at the end of the answer in new line: [Source- Document] if the answer is from a document
-or [Source- general knowledge] if the answer is from your general knowledge.
+add source at the end of your response: 
+  -[Source- Documents] if the answer is from a Context.
+  -[Source- general knowledge] if the answer is from your general knowledge.
 
 ${history ? `Conversation:\n${history}\n\n` : ''}Context:
 ${context}
