@@ -67,6 +67,7 @@ IMPORTANT RULES (MUST FOLLOW STRICTLY):
 8. Do NOT apologize, speculate, or explain missing context unless explicitly asked.
 9. If CONTEXT is empty or irrelevant, answer using GENERAL KNOWLEDGE only.
 10. Do NOT repeat phrases, sentence fragments, or partial clauses.
+11. Make sure always mention the source label at the end of EACH answer for each query and place it at the end of the paragraph in a new single line.
 
 Formatting rules:
 - Do NOT join multiple ideas with commas or conjunctions.
