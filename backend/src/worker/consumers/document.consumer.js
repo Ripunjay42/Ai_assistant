@@ -8,67 +8,84 @@ import { randomUUID } from 'crypto';
 
 
 const COLLECTION = 'documents';
+const CONCURRENCY = 3; // Process 3 documents concurrently
+
+// Extract processing logic into separate function
+const processDocument = async (job) => {
+  const { documentId, workspaceId, bucket, s3Key } = job;
+  
+  console.log(`Processing document: ${documentId}`);
+
+  await db.Document.update(
+    { status: 'PROCESSING' },
+    { where: { id: documentId } }
+  );
+
+  const fileBuffer = await readFileFromS3(bucket, s3Key);
+  const text = await extractText(fileBuffer, s3Key);
+  const chunks = chunkText(text);
+  const embeddings = await generateEmbeddings(chunks);
+
+  const points = embeddings.map((e, index) => ({
+    id: randomUUID(),
+    vector: e.embedding,
+    payload: {
+      documentId,
+      workspaceId,
+      chunkIndex: index,
+      text: chunks[index]
+    }
+  }));
+
+  console.log('Points to be inserted:', {
+    totalPoints: points.length,
+    samplePoint: points[0],
+    vectorDimension: points[0]?.vector.length
+  });
+
+  await qdrantClient.upsert(COLLECTION, {
+    points
+  });
+
+  await db.Document.update(
+    { status: 'READY' },
+    { where: { id: documentId } }
+  );
+
+  console.log(`Document ready: ${documentId}`);
+};
 
 export const startDocumentConsumer = (channel, queueName) => {
+  // Set prefetch to allow concurrent processing
+  channel.prefetch(CONCURRENCY);
+  console.log(`Document consumer started with concurrency: ${CONCURRENCY}`);
+
   channel.consume(queueName, async (msg) => {
     if (!msg) return;
 
-    const job = JSON.parse(msg.content.toString());
-    console.log('Received job:', job);
-    const { documentId, workspaceId, bucket, s3Key } = job;
-
     try {
-      console.log(`Processing document: ${documentId}`);
+      const job = JSON.parse(msg.content.toString());
+      console.log('Received job:', job);
 
-      await db.Document.update(
-        { status: 'PROCESSING' },
-        { where: { id: documentId } }
-      );
-
-      const fileBuffer = await readFileFromS3(bucket, s3Key);
-      const text = await extractText(fileBuffer, s3Key);
-      const chunks = chunkText(text);
-      const embeddings = await generateEmbeddings(chunks);
-
-        const points = embeddings.map((e, index) => ({
-        id: randomUUID(),
-        vector: e.embedding,
-        payload: {
-          documentId,
-          workspaceId,
-          chunkIndex: index,
-          text: chunks[index]
-        }
-      }));
-
-      console.log('Points to be inserted:', {
-        totalPoints: points.length,
-        samplePoint: points[0],
-        vectorDimension: points[0]?.vector.length
-      });
-
-      await qdrantClient.upsert(COLLECTION, {
-        points
-      });
-
-
-
-      await db.Document.update(
-        { status: 'READY' },
-        { where: { id: documentId } }
-      );
+      await processDocument(job);
 
       channel.ack(msg);
-      console.log(`Document ready: ${documentId}`);
     } catch (err) {
-      console.error(`Failed document ${documentId}`, err);
+      console.error('Failed job:', err);
+      
+      // Update document status to FAILED
+      try {
+        const job = JSON.parse(msg.content.toString());
+        await db.Document.update(
+          { status: 'FAILED' },
+          { where: { id: job.documentId } }
+        );
+      } catch (updateErr) {
+        console.error('Failed to update document status:', updateErr);
+      }
 
-      await db.Document.update(
-        { status: 'FAILED' },
-        { where: { id: documentId } }
-      );
-
-      channel.nack(msg, false, false); // drop message
+      // Don't requeue failed messages
+      channel.nack(msg, false, false);
     }
   });
 };

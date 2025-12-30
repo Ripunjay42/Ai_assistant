@@ -33,7 +33,7 @@ http.createServer((req, res) => {
     res.writeHead(404);
     res.end();
   }
-}).listen(process.env.PORT || 3001, () => {
-  console.log('Worker health endpoint running');
+}).listen(3001, () => {
+  console.log(`Worker health endpoint running on port ${3001}`);
 });
 
