@@ -149,7 +149,7 @@ export default function DocumentList() {
                 <button
                   onClick={() => handleDeleteDocument(doc.id, doc.name)}
                   disabled={deletingIds.has(doc.id)}
-                  className="p-0.5 opacity-0 group-hover:opacity-100 hover:bg-destructive/20 rounded-full transition-all disabled:opacity-100"
+                  className="p-0.5 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-destructive/20 rounded-full transition-all disabled:opacity-100"
                 >
                   {deletingIds.has(doc.id) ? (
                     <Loader2 className="w-3 h-3 text-primary animate-spin" />
