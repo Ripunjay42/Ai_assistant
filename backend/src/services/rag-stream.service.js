@@ -53,8 +53,9 @@ If relevant information is available in the CONTEXT, use it to provide accurate,
 If the CONTEXT does not contain the required information, answer using your general knowledge.
 Write the answer in clear paragraphs.
 After EACH paragraph, include a source label on a new line using ONE of the following formats:
-- [Source: Documents]
-- [Source: General Knowledge]
+- [Source: Documents] (if the information is from the CONTEXT)
+- [Source: General Knowledge] (if the information is from your own knowledge)
+never fabricate source labels.
 Do not invent facts.
 Do not reference documents that are not present in the CONTEXT.
 
