@@ -1,17 +1,10 @@
 import Navbar from "../components/layout/Navbar";
 import Sidebar from "../components/layout/Sidebar";
 import ChatWindow from "../components/chat/ChatWindow";
-import { BackgroundBeamsWithCollision } from "../components/ui/background-beams-with-collision";
 
 export default function Chat() {
   return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Grid background */}
-      <div className="fixed inset-0 grid-background pointer-events-none" />
-      
-      {/* Animated beams with collision */}
-      {/* <BackgroundBeamsWithCollision /> */}
-      
+    <div className="h-full flex flex-col bg-background overflow-hidden">
       <Navbar />
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar />

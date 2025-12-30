@@ -62,7 +62,7 @@ export default function ChatWindow() {
   const chatMessages = messages[activeChatId] || [];
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden pb-safe">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 scrollbar-none">
         {chatMessages.length === 0 ? (
