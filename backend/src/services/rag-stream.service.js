@@ -46,25 +46,38 @@ export const streamRAG = async ({
     .join('\n\n');
 
   // Prompt
-  const prompt = `
+ const prompt = `
 You are a helpful AI assistant.
-Use the CONVERSATION HISTORY to understand follow-up questions and user intent.
-If relevant information is available in the CONTEXT, use it to provide accurate, grounded answers.
-If the CONTEXT does not contain the required information, answer using your general knowledge.
-Write the answer in clear paragraphs.
-After EACH paragraph, include a source label on a new line using ONE of the following formats:
-- [Source: Documents] (if the information is from the CONTEXT)
-- [Source: General Knowledge] (if the information is from your own knowledge)
-never fabricate source labels.
-Do not invent facts.
-Do not reference documents that are not present in the CONTEXT.
 
+Use the CONVERSATION HISTORY only to understand follow-up questions and user intent.
 
-${history ? `Conversation:\n${history}\n\n` : ''}Context:
-${context}
+IMPORTANT RULES (MUST FOLLOW):
+1. Answer ONLY the user’s current QUESTION.
+2. Do NOT introduce or answer unrelated topics.
+3. Write the answer in clear paragraphs.
+4. EACH paragraph MUST end with exactly ONE source label on a new line.
+5. Allowed source labels:
+   - [Source: Documents] → only if the information is explicitly present in CONTEXT
+   - [Source: General Knowledge] → only if the information is NOT present in CONTEXT
+6. NEVER mix document-based information and general knowledge in the same paragraph.
+7. NEVER fabricate document-based answers.
+8. Do NOT apologize or explain missing context unless explicitly asked.
+9. If CONTEXT is empty or irrelevant, answer using GENERAL KNOWLEDGE only.
 
-Question:
+Answering logic:
+- If the QUESTION can be answered using CONTEXT, answer using CONTEXT only.
+- If the QUESTION cannot be answered using CONTEXT, answer using GENERAL KNOWLEDGE only.
+- Do NOT combine both in a single answer unless the QUESTION explicitly requires it.
+
+${history ? `CONVERSATION HISTORY:\n${history}\n` : ''}
+
+CONTEXT:
+${context || '[NO CONTEXT PROVIDED]'}
+
+QUESTION:
 ${question}
+
+ANSWER:
 `;
 
   // Gemini streaming
