@@ -1,15 +1,12 @@
 import { useState } from "react";
-import { PenSquare, MessagesSquare, Trash2, MessageCircle, FolderOpen, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PenSquare, MessagesSquare, Trash2, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useChatStore } from "../../store/chat.store";
 import { useAuthStore } from "../../store/auth.store";
-import DocumentUpload from "../documents/DocumentUpload";
 import { useSidebarStore } from "../../store/sidebar.store";
 
 export default function Sidebar() {
   const { chats, createChat, setActiveChat, activeChatId, deleteChat } = useChatStore();
   const token = useAuthStore((s) => s.token);
-  const [showUpload, setShowUpload] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { isMobileOpen, setIsMobileOpen } = useSidebarStore();
 
@@ -128,34 +125,7 @@ export default function Sidebar() {
               </div>
             ))
           )}
-        </div>        {/* Documents Section */}
-        {token && (
-          <div className={`border-t border-border/50 transition-all duration-300 ${
-            isCollapsed ? 'lg:hidden' : ''
-          }`}>
-            <button
-              onClick={() => setShowUpload(!showUpload)}
-              className="w-full px-3 py-3 flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <FolderOpen className="w-4 h-4" />
-                <span className="transition-all duration-300">Documents</span>
-              </div>
-              {showUpload ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </button>
-            {showUpload && (
-              <div className="px-3 pb-3">
-                <DocumentUpload />
-              </div>
-            )}
-          </div>
-        )}
-
-      </div>
+        </div>      </div>
     </>
   );
 }

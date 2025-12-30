@@ -4,6 +4,7 @@ import Chat from './pages/Chat'
 import AuthModal from './components/auth/AuthModal'
 import { useAuthStore } from './store/auth.store'
 import { useChatStore } from './store/chat.store'
+import { Toaster } from '@/components/ui/toaster'
 
 export default function App() {
   const user = useAuthStore((s) => s.user);
@@ -29,6 +30,8 @@ export default function App() {
         {/* Chat is the default page - auth modal shown when trying to chat without login */}
         <Route path="/" element={<Chat />} />
       </Routes>
+      
+      <Toaster />
     </BrowserRouter>
   )
 }

@@ -4,6 +4,7 @@ import { useChatStore } from "../../store/chat.store";
 import { Button } from "@/components/ui/button";
 import ChatInput from "./ChatInput";
 import MessageBubble from "./MessageBubble";
+import DocumentList from "../documents/DocumentList";
 
 export default function ChatWindow() {
   const { activeChatId, messages, createChat } = useChatStore();
@@ -91,9 +92,12 @@ export default function ChatWindow() {
         )}
       </div>
 
-      {/* Input area */}
-      <div className="shrink-0 p-3 sm:p-6 border-t border-border/30 bg-background">
-        <ChatInput />
+      {/* Input area with documents */}
+      <div className="shrink-0 border-t border-border/30 bg-background">
+        <DocumentList />
+        <div className="pl-6 pt-3">
+          <ChatInput />
+        </div>
       </div>
     </div>
   );

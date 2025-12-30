@@ -47,11 +47,12 @@ export const streamRAG = async ({
 
   // Prompt
   const prompt = `
-You are an AI assistant.
-Answer the question using ONLY the information provided in the CONTEXT section.
-Use the CONVERSATION HISTORY only to understand follow-up questions or references.
-Do NOT use external knowledge, assumptions, or prior training data.
-If the answer is not present, say "I don’t see this information in the documents I have access to".
+You are a helpful AI assistant.
+Use the CONVERSATION HISTORY to understand follow-up questions and user intent.
+If relevant information is available in the CONTEXT, use it to provide an accurate, grounded answer.
+If the CONTEXT does not contain the answer or is empty, answer the question using your general knowledge.
+Be clear, concise, and helpful.
+Do not invent facts or reference documents that are not present.
 
 ${history ? `Conversation:\n${history}\n\n` : ''}Context:
 ${context}
