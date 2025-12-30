@@ -30,7 +30,8 @@ export const streamChat = async ({ question, workspaceId, chatId }) => {
 
   if (!response.ok) {
     if (response.status === 429) {
-      throw new Error("Too many requests. Please slow down.");
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Too many requests. Please slow down.");
     }
     throw new Error("Chat request failed");
   }
