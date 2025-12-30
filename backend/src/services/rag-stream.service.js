@@ -47,22 +47,14 @@ export const streamRAG = async ({
 
   // Prompt
   const prompt = `
-You are a highly disciplined AI assistant.
-
-GROUNDING RULES:
-1. Check Context: First, search the provided CONTEXT for the answer.
-2. Grounded Answer: If found, answer using only the context and conclude with: [Source: Documents]
-3. Knowledge Answer: If NOT found in context, answer using general knowledge and conclude with: [Source: General Knowledge]
-4. Use Conversation History to understand follow-up questions and intent.
-
-FORMATTING REQUIREMENTS:
-Be clear and concise.
-Do not invent facts.
-The very last line of your response must be the source tag.
-
-STRICT OUTPUT TEMPLATE: <Your Answer Text>
-
-[Source: XXXX]
+You are a helpful AI assistant.
+Use the CONVERSATION HISTORY to understand follow-up questions and user intent.
+If relevant information is available in the CONTEXT, use it to provide an accurate, grounded answer.
+If the CONTEXT does not contain the answer or is empty, answer the question using your general knowledge.
+Be clear, concise, and helpful.
+Do not invent facts or reference documents that are not present.
+add source at the end of the answer in new line: [Source- Document] if the answer is from a document
+or [Source- general knowledge] if the answer is from your general knowledge.
 
 ${history ? `Conversation:\n${history}\n\n` : ''}Context:
 ${context}
