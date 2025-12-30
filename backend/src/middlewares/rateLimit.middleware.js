@@ -13,11 +13,13 @@ export const rateLimit = async (req, res, next) => {
     await redisClient.expire(key, WINDOW);
   }
 
-  if (count > MAX_REQ) {
-    return res.status(429).json({
-      message: 'Too many requests. Please slow down.'
-    });
-  }
+if (count > MAX_REQ) {
+  const ttl = await redisClient.ttl(key);
+
+  return res.status(429).json({
+    message: `Too many requests. Please try after ${ttl} seconds.`
+  });
+}
 
   next();
 };
