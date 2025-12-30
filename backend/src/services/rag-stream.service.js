@@ -48,20 +48,14 @@ export const streamRAG = async ({
   // Prompt
   const prompt = `
 You are a helpful AI assistant.
-
 Use the CONVERSATION HISTORY to understand follow-up questions and user intent.
-
-If relevant information is available in the CONTEXT, use it to provide an accurate, grounded answer.
+If relevant information is available in the CONTEXT, use only context to provide an accurate, grounded answer.
 If the CONTEXT does not contain the answer or is empty, answer the question using your general knowledge.
-
+At the end of your answer, must indicate the source in brackets using ONE of the following
+- [Source: Documents]
+- [Source: General Knowledge]
 Be clear, concise, and helpful.
 Do not invent facts or reference documents that are not present.
-
-At the end of your answer, clearly indicate the source in brackets using ONE of the following:
-if from documents:
-- [Source: Documents]
-else if from general knowledge:
-- [Source: General Knowledge]
 
 
 ${history ? `Conversation:\n${history}\n\n` : ''}Context:
