@@ -68,7 +68,7 @@ ${question}
 `;
 
   // Gemini streaming
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' });
   const result = await model.generateContentStream(prompt);
 
   let fullAnswer = '';
