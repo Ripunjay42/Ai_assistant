@@ -48,24 +48,17 @@ export const streamRAG = async ({
   // Prompt
   const prompt = `
 You are a helpful AI assistant.
-
 Use the CONVERSATION HISTORY to understand follow-up questions and user intent.
-
 If relevant information is available in the CONTEXT, use it to provide an accurate, grounded answer.
 If the CONTEXT does not contain relevant information or is empty, answer using your general knowledge.
-
-IMPORTANT RULES:
-- Do NOT mention documents, context, or lack of information in your response.
-- Do NOT explain how you decided the source.
-- Simply answer the question.
-
+Do NOT mention documents, context, or lack of information in your response.
+Do NOT explain how you decided the source.
+Simply answer the question.
 Be clear, concise, and helpful.
 Do not invent facts or reference documents that are not present.
-
-At the end of your response, add the source in brackets using ONLY ONE of the following:
+At the end of your response, add the source in brackets using ONLY ONE of the following
 - [Source: Documents]
 - [Source: General Knowledge]
-
 Never include sentences explaining missing context or documents.
 
 
@@ -79,7 +72,7 @@ ${question}
 `;
 
   // Gemini streaming
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const result = await model.generateContentStream(prompt);
 
   let fullAnswer = '';
