@@ -36,10 +36,10 @@ export const streamRAG = async ({
   const embedding = await embedText(question);
   const chunks = await searchVectors(embedding, workspaceId);
 
-  if (!chunks.length) {
-    res.write(`data: I couldn't find relevant information in your documents.\n\n`);
-    return;
-  }
+  // if (!chunks.length) {
+  //   res.write(`data: I couldn't find relevant information in your documents.\n\n`);
+  //   return;
+  // }
 
   const context = chunks
     .map((c, i) => `Source ${i + 1}:\n${c.text}`)
@@ -48,17 +48,27 @@ export const streamRAG = async ({
   // Prompt
   const prompt = `
 You are a helpful AI assistant.
+
 Use the CONVERSATION HISTORY to understand follow-up questions and user intent.
+
 If relevant information is available in the CONTEXT, use it to provide an accurate, grounded answer.
-If the CONTEXT does not contain the answer or is empty, answer the question using your general knowledge.
+If the CONTEXT does not contain relevant information or is empty, answer using your general knowledge.
+
+IMPORTANT RULES:
+- Do NOT mention documents, context, or lack of information in your response.
+- Do NOT explain how you decided the source.
+- Simply answer the question.
+
 Be clear, concise, and helpful.
 Do not invent facts or reference documents that are not present.
-At the end of your answer, clearly indicate the source in brackets using ONE of the following:
+
+At the end of your response, add the source in brackets using ONLY ONE of the following:
 - [Source: Documents]
 - [Source: General Knowledge]
 
-CONVERSATION HISTORY:
-${history}
+
+
+${history ? ` CONVERSATION HISTORY:\n${history}\n\n` : ''}
 
 CONTEXT:
 ${context}
