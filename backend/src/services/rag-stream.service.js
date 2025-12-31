@@ -63,8 +63,8 @@ Be clear, concise, and helpful.
 Do not invent facts or reference documents that are not present.
 
 At the end of your response, add the source in brackets using ONLY ONE of the following:
-- [Source: Documents]
-- [Source: General Knowledge]
+- [Source: Documents] if the answer is based on the CONTEXT provided
+- [Source: General Knowledge] if the answer is based on your own knowledge
 
 
 
