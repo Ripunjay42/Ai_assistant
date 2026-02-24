@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { qdrantClient } from '../config/vector.js';
 
 const COLLECTION_NAME = 'documents';
-const VECTOR_SIZE = 768; // text-embedding-004 uses 768 dimensions
+const VECTOR_SIZE = 768; // embedding-001 uses 768 dimensions
 
 const run = async () => {
   try {

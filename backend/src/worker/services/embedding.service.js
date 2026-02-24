@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const generateEmbeddings = async (chunks) => {
-  const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+  const model = genAI.getGenerativeModel({ model: 'embedding-001' });
   
   const embeddings = [];
   
@@ -27,7 +27,7 @@ export const generateEmbeddings = async (chunks) => {
     }
   }
   
-  console.log(`✅ Generated ${embeddings.length} embeddings using Gemini text-embedding-004`);
+  console.log(`✅ Generated ${embeddings.length} embeddings using Gemini embedding-001`);
   
   return embeddings;
 };
