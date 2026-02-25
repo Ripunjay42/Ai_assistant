@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { qdrantClient } from '../config/vector.js';
 
 const COLLECTION_NAME = 'documents';
-const VECTOR_SIZE = 768; // embedding-001 uses 768 dimensions
+const VECTOR_SIZE = 3072; // gemini-embedding-001 now uses 3072 dimensions
 
 const run = async () => {
   try {

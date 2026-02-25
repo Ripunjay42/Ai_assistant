@@ -12,7 +12,7 @@ export const generateEmbeddings = async (chunks) => {
       // Generate embedding for this chunk
       const result = await model.embedContent(chunk);
       embeddings.push({
-        embedding: result.embedding.values // 768-dimensional vector
+        embedding: result.embedding.values // 3072-dimensional vector
       });
       
       // Small delay to avoid rate limits (100ms between requests)
@@ -22,7 +22,7 @@ export const generateEmbeddings = async (chunks) => {
       console.error('Embedding generation failed for chunk:', error.message);
       // Use zero vector as fallback (not ideal, but prevents pipeline failure)
       embeddings.push({
-        embedding: Array(768).fill(0)
+        embedding: Array(3072).fill(0)
       });
     }
   }

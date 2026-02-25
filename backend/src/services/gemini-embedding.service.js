@@ -10,6 +10,6 @@ export const embedText = async (text) => {
     
     const result = await model.embedContent(text);
     
-    return result.embedding.values; // array<number>
+    return result.embedding.values; // array<number> (3072 dimensions)
   }, 3, 2000); // 3 retries, starting with 2s delay
 };
